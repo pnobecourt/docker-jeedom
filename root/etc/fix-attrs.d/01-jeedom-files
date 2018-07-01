@@ -1,0 +1,2 @@
+/var/www/html true dockeruser:dockeruser,$PUID:$PGID 0644 0755
+/tmp/jeedom true dockeruser:dockeruser,$PUID:$PGID 0666 0777

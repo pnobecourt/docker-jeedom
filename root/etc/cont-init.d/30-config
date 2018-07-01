@@ -1,0 +1,203 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Change root password
+#------------------------------------------------------------------------------
+if [ -z ${SHELL_ROOT_PASSWORD} ]; then
+	SHELL_ROOT_PASSWORD=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 20)
+	echo "Use generate root password : ${SHELL_ROOT_PASSWORD}"
+fi
+echo "root:${SHELL_ROOT_PASSWORD}" | chpasswd
+
+
+#------------------------------------------------------------------------------
+# Configure SSH
+#------------------------------------------------------------------------------
+
+## Change SSHD listening port
+if [ ! -z ${SSH_PORT} ]; then
+	echo 'Change SSH listen port to : '${SSH_PORT}
+	sed '/Port /d' /etc/ssh/sshd_config
+	echo "Port ${SSH_PORT}" >> /etc/ssh/sshd_config
+fi
+
+## Permit root login thru SSH
+sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
+
+
+#------------------------------------------------------------------------------
+# Configure Apache Web Server
+#------------------------------------------------------------------------------
+
+## Fix Apache Private Tmp
+rm /etc/systemd/system/multi-user.target.wants/apache2.service
+cp /lib/systemd/system/apache2.service /etc/systemd/system/multi-user.target.wants/
+sed -i 's/PrivateTmp=true/PrivateTmp=false/g' /etc/systemd/system/multi-user.target.wants/apache2.service > /dev/null 2>&1
+sed -i 's/PrivateTmp=true/PrivateTmp=false/g' /lib/systemd/system/apache2.service > /dev/null 2>&1
+
+## Change Apache listening port
+if [ ! -z ${APACHE_PORT} ]; then
+	echo 'Change apache listen port to : '${APACHE_PORT}
+	echo "Listen ${APACHE_PORT}" > /etc/apache2/ports.conf
+	sed -i -E "s/\<VirtualHost \*:(.*)\>/VirtualHost \*:${APACHE_PORT}/" /etc/apache2/sites-enabled/000-default.conf
+fi
+
+## Configure Apache security
+cp ${JEEDOM_VOL}/install/apache_security /etc/apache2/conf-available/security.conf
+rm /etc/apache2/conf-enabled/security.conf > /dev/null 2>&1
+ln -s /etc/apache2/conf-available/security.conf /etc/apache2/conf-enabled/
+
+## Configure Apache default site
+cp ${JEEDOM_VOL}/install/apache_default /etc/apache2/sites-available/000-default.conf
+rm /etc/apache2/sites-enabled/000-default.conf > /dev/null 2>&1
+ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/
+
+## Remove vhost configuration
+rm /etc/apache2/conf-available/other-vhosts-access-log.conf > /dev/null 2>&1
+rm /etc/apache2/conf-enabled/other-vhosts-access-log.conf > /dev/null 2>&1
+
+## Configure Apache systemd service
+mkdir /etc/systemd/system/apache2.service.d
+echo "[Service]" > /etc/systemd/system/apache2.service.d/privatetmp.conf
+echo "PrivateTmp=no" >> /etc/systemd/system/apache2.service.d/privatetmp.conf
+
+
+#------------------------------------------------------------------------------
+# Configure PHP settings
+#------------------------------------------------------------------------------
+for file in $(find / -iname php.ini -type f); do
+		echo "Update php file ${file}"
+		sed -i 's/max_execution_time = 30/max_execution_time = 600/g' ${file} > /dev/null 2>&1
+	    sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 1G/g' ${file} > /dev/null 2>&1
+	    sed -i 's/post_max_size = 8M/post_max_size = 1G/g' ${file} > /dev/null 2>&1
+	    sed -i 's/expose_php = On/expose_php = Off/g' ${file} > /dev/null 2>&1
+	    sed -i 's/;opcache.enable=0/opcache.enable=1/g' ${file} > /dev/null 2>&1
+	    sed -i 's/opcache.enable=0/opcache.enable=1/g' ${file} > /dev/null 2>&1
+	    sed -i 's/;opcache.enable_cli=0/opcache.enable_cli=1/g' ${file} > /dev/null 2>&1
+	    sed -i 's/opcache.enable_cli=0/opcache.enable_cli=1/g' ${file} > /dev/null 2>&1
+done
+for folder in php5 php7; do
+		for subfolder in apache2 cli; do
+	    	if [ -f /etc/${folder}/${subfolder}/php.ini ]; then
+	    		echo "Update php file /etc/${folder}/${subfolder}/php.ini"
+				sed -i 's/max_execution_time = 30/max_execution_time = 600/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 1G/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/post_max_size = 8M/post_max_size = 1G/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/expose_php = On/expose_php = Off/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/;opcache.enable=0/opcache.enable=1/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/opcache.enable=0/opcache.enable=1/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/;opcache.enable_cli=0/opcache.enable_cli=1/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+			    sed -i 's/opcache.enable_cli=0/opcache.enable_cli=1/g' /etc/${folder}/${subfolder}/php.ini > /dev/null 2>&1
+	    	fi
+		done
+done
+
+
+#------------------------------------------------------------------------------
+# Configure MySQL
+#------------------------------------------------------------------------------
+if [ -d /etc/mysql/conf.d ]; then
+    	touch /etc/mysql/conf.d/jeedom_my.cnf
+    	echo "[mysqld]" >> /etc/mysql/conf.d/jeedom_my.cnf
+    	echo "skip-name-resolve" >> /etc/mysql/conf.d/jeedom_my.cnf
+    	echo "key_buffer_size = 16M" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "thread_cache_size = 16" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "tmp_table_size = 48M" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "max_heap_table_size = 48M" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "query_cache_type =1" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "query_cache_size = 32M" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "query_cache_limit = 2M" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "query_cache_min_res_unit=3K" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "innodb_flush_method = O_DIRECT" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "innodb_flush_log_at_trx_commit = 2" >> /etc/mysql/conf.d/jeedom_my.cnf
+		echo "innodb_log_file_size = 32M" >> /etc/mysql/conf.d/jeedom_my.cnf
+fi
+
+
+#------------------------------------------------------------------------------
+# Configure Jeedom database
+#------------------------------------------------------------------------------
+mysql -h ${MYSQL_HOST} -uroot -p${MYSQL_ROOT_PASSWD} > /dev/null 2>&1
+if [ -z ${MYSQL_JEEDOM_PASSWD} ]; then
+	MYSQL_JEEDOM_PASSWD=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 20)
+	echo "Use generate jeedom mysql password : ${MYSQL_JEEDOM_PASSWD}"
+fi
+mysql_sql "CREATE USER 'jeedom'@'localhost' IDENTIFIED BY '${MYSQL_JEEDOM_PASSWD}';"
+mysql_sql "DROP DATABASE IF EXISTS jeedom;"
+mysql_sql "CREATE DATABASE jeedom;"
+mysql_sql "GRANT ALL PRIVILEGES ON jeedom.* TO 'jeedom'@'localhost';"
+cp ${JEEDOM_VOL}/core/config/common.config.sample.php ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#PASSWORD#/${MYSQL_JEEDOM_PASSWD}/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#DBNAME#/jeedom/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#USERNAME#/jeedom/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#PORT#/3306/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#HOST#/${MYSQL_HOST}/g" ${JEEDOM_VOL}/core/config/common.config.php
+
+
+#------------------------------------------------------------------------------
+# Configure hosts file
+#------------------------------------------------------------------------------
+if [ ! -z ${MODE_HOST} ] && [ ${MODE_HOST} -eq 1 ]; then
+	echo 'Update /etc/hosts for host mode'
+	echo "127.0.0.1 localhost jeedom" > /etc/hosts
+fi
+
+
+#------------------------------------------------------------------------------
+# Configure users
+#------------------------------------------------------------------------------
+usermod -a -G dialout,tty www-data
+usermod -a -G dialout,tty dockeruser
+if [ $(grep "www-data ALL=(ALL) NOPASSWD: ALL" /etc/sudoers | wc -l) -eq 0 ];then
+    echo "www-data ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+fi
+if [ $(grep "dockeruser ALL=(ALL) NOPASSWD: ALL" /etc/sudoers | wc -l) -eq 0 ];then
+    echo "dockeruser ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+fi
+
+
+#------------------------------------------------------------------------------
+# Tmp filesystem config
+#------------------------------------------------------------------------------
+if [ $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }') -gt 600000 ]; then
+  		if [ $(cat /etc/fstab | grep /tmp/jeedom | grep tmpfs | wc -l) -eq 0 ];then
+  			echo 'tmpfs        /tmp/jeedom            tmpfs  defaults,size=128M                                       0 0' >>  /etc/fstab
+  		fi
+fi
+
+#------------------------------------------------------------------------------
+# Jeedom Install
+#------------------------------------------------------------------------------
+mkdir -p /tmp/jeedom
+chmod 777 -R /tmp/jeedom
+chown www-data:www-data -R /tmp/jeedom
+php ${JEEDOM_VOL}/install/install.php mode=force
+
+
+#------------------------------------------------------------------------------
+# Install Jeedom crcon
+#------------------------------------------------------------------------------
+if [ $(crontab -l | grep jeedom | wc -l) -ne 0 ];then
+		(echo crontab -l | grep -v "jeedom") | crontab -
+fi
+if [ ! -f /etc/cron.d/jeedom ]; then
+	echo "* * * * * www-data /usr/bin/php ${JEEDOM_VOL}/core/php/jeeCron.php >> /dev/null" > /etc/cron.d/jeedom
+fi
+if [ ! -f /etc/cron.d/jeedom_watchdog ]; then
+	echo "*/5 * * * * root /usr/bin/php ${JEEDOM_VOL}/core/php/watchdog.php >> /dev/null" > /etc/cron.d/jeedom_watchdog
+fi
+
+#------------------------------------------------------------------------------
+# Fix permissions
+#------------------------------------------------------------------------------
+chmod 777 /dev/tty*
+chmod 777 -R /tmp
+chmod 755 -R ${JEEDOM_VOL}
+chown -R www-data:www-data /tmp/jeedom
+chown -R www-data:www-data ${JEEDOM_VOL}
+
+#------------------------------------------------------------------------------
+# Cleaning
+#------------------------------------------------------------------------------
+rm -rf ${JEEDOM_VOL}/index.html > /dev/null 2>&1
