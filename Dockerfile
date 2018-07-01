@@ -25,7 +25,7 @@ MODE_HOST=0
 
 # Jeedom installation
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends apt-transport-https \
+    apt-get install -y --no-install-recommends apt-transport-https && \
     echo "deb http://www.deb-multimedia.org stretch main non-free" | tee -a /etc/apt/sources.list.d/debian-multimedia.list && \
     echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/apt/sources.list.d/nodesource.list && \
     apt-get update ; \
@@ -35,7 +35,6 @@ RUN apt-get update && \
    	 	 	 	 	adduser \
 	 	 	 	 	apache2 \
 	 	 	 	 	apache2-utils \
-	 	 	 	 	apt-transport-https \
 	 	 	 	 	apt-utils \
 	 	 	 	 	build-essential \
 	 	 	 	 	ca-certificates \
