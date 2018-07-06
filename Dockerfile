@@ -25,7 +25,7 @@ MODE_HOST=0
 
 # Jeedom installation
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends apt-transport-https curl && \
+    apt-get install -y --no-install-recommends apt-transport-https curl gnupg && \
     echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/apt/sources.list.d/nodesource.list && \
     echo "deb http://www.deb-multimedia.org stretch main non-free" | tee -a /etc/apt/sources.list.d/debian-multimedia.list && \
     apt-get update ; \
