@@ -94,22 +94,6 @@ RUN apt-get update && \
 	 	 	 	 	ntpdate \
 	 	 	 	 	openssh-server \
 	 	 	 	 	ow-shell \
-	 	 	 	 	php5 \
-	 	 	 	 	php5-cli \
-	 	 	 	 	php5-common \
-	 	 	 	 	php5-curl \
-	 	 	 	 	php5-dev \
-	 	 	 	 	php5-fpm \
-	 	 	 	 	php5-gd \
-	 	 	 	 	php5-json \
-	 	 	 	 	php5-ldap \
-	 	 	 	 	php5-mbstring \
-	 	 	 	 	php5-memcached \
-	 	 	 	 	php5-mysql \
-	 	 	 	 	php5-mysqlnd \
-	 	 	 	 	php5-oauth \
-	 	 	 	 	php5-redis \
-	 	 	 	 	php5-ssh2 \
 	 	 	 	 	php7.0 \
 	 	 	 	 	php7.0-common \
 	 	 	 	 	php7.0-curl \
