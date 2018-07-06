@@ -47,42 +47,30 @@ RUN apt-get update && \
 	 	 	 	 	duplicity \
 	 	 	 	 	espeak \
 	 	 	 	 	fail2ban \
-	 	 	 	 	gir1.2-glib-2.0 \
 	 	 	 	 	git \
 	 	 	 	 	htop \
 	 	 	 	 	iftop \
 	 	 	 	 	iotop \
 	 	 	 	 	iso-codes \
 	 	 	 	 	javascript-common \
-	 	 	 	 	libapache2-mod-php5 \
 	 	 	 	 	libapache2-mod-php7.0 \
-	 	 	 	 	libapt-inst1.5 \
 	 	 	 	 	libarchive-dev \
 	 	 	 	 	libav-tools \
-	 	 	 	 	libdbus-glib-1-2 \
 	 	 	 	 	libexpat1 \
-	 	 	 	 	libgirepository-1.0-1 \
 	 	 	 	 	libjs-jquery \
 	 	 	 	 	libjsoncpp-dev \
 	 	 	 	 	libmpdec2 \
 	 	 	 	 	libpcre3-dev \
-	 	 	 	 	libpython3.4-minimal \
-	 	 	 	 	libpython3.4-stdlib \
 	 	 	 	 	libpython3-stdlib \
-	 	 	 	 	libruby2.1 \
 	 	 	 	 	libsox-fmt-mp3 \
-	 	 	 	 	libssh2-php \
 	 	 	 	 	libtinyxml-dev \
-	 	 	 	 	libttspico-utils \
 	 	 	 	 	libudev1 \
 	 	 	 	 	libxml2 \
-	 	 	 	 	libyaml-0-2 \
 	 	 	 	 	locales \
 	 	 	 	 	locate \
 	 	 	 	 	logrotate \
 	 	 	 	 	lsb-release \
 	 	 	 	 	make \
-	 	 	 	 	mbrola \
 	 	 	 	 	miniupnpc \
 	 	 	 	 	mysql-client \
 	 	 	 	 	mysql-common \
@@ -114,8 +102,6 @@ RUN apt-get update && \
 	 	 	 	 	php-pear \
 	 	 	 	 	python \
 	 	 	 	 	python3 \
-	 	 	 	 	python3.4 \
-	 	 	 	 	python3.4-minimal \
 	 	 	 	 	python3-apt \
 	 	 	 	 	python3-dbus \
 	 	 	 	 	python3-gi \
@@ -125,7 +111,6 @@ RUN apt-get update && \
 	 	 	 	 	python-pip \
 	 	 	 	 	python-serial \
 	 	 	 	 	ruby \
-	 	 	 	 	ruby2.1 \
 	 	 	 	 	rubygems-integration \
 	 	 	 	 	smbclient \
 	 	 	 	 	software-properties-common \
