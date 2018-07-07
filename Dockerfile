@@ -130,7 +130,6 @@ RUN apt-get update && \
 	 	 	 	 	xauth \
 	 	 	 	 	xvfb \
                     && \
-    apt-get purge -y brltty && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf \
@@ -142,7 +141,7 @@ RUN apt-get update && \
     curl -L -S https://github.com/jeedom/core/archive/stable.zip -o /tmp/jeedom_stable.zip && \
     mkdir -p /tmp/install_temp ${JEEDOM_VOL} && \
     find ${JEEDOM_VOL} ! -name 'index.html' -type f -exec rm -rf {} && \
-    unzip -qo /tmp/jeedom_stable.zip -d /tmp/install_temp && \
+##    unzip -qo /tmp/jeedom_stable.zip -d /tmp/install_temp && 
     cp -R /tmp/install_temp/core-*/* ${JEEDOM_VOL} && \
     cp -R /tmp/install_temp/core-*/.[^.]* ${JEEDOM_VOL} && \
     rm -rf /tmp/install_temp > /dev/null 2>&1 && \
