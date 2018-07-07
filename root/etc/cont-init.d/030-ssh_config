@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Configure SSH
+#------------------------------------------------------------------------------
+
+## Change SSHD listening port
+if [ ! -z ${SSH_PORT} ]; then
+	echo 'Change SSH listen port to : '${SSH_PORT}
+	sed '/Port /d' /etc/ssh/sshd_config
+	echo "Port ${SSH_PORT}" >> /etc/ssh/sshd_config
+fi
+
+## Permit root login thru SSH
+sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd

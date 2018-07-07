@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Fix permissions
+#------------------------------------------------------------------------------
+chmod 777 /dev/tty*
+chmod 777 -R /tmp
+chmod 755 -R ${JEEDOM_VOL}
+chown -R www-data:www-data /tmp/jeedom
+chown -R www-data:www-data ${JEEDOM_VOL}

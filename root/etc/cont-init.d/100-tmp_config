@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Tmp filesystem config
+#------------------------------------------------------------------------------
+if [ $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }') -gt 600000 ]; then
+  		if [ $(cat /etc/fstab | grep /tmp/jeedom | grep tmpfs | wc -l) -eq 0 ];then
+  			echo 'tmpfs        /tmp/jeedom            tmpfs  defaults,size=128M                                       0 0' >>  /etc/fstab
+  		fi
+fi

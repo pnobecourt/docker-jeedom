@@ -1,0 +1,20 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Configure Jeedom database
+#------------------------------------------------------------------------------
+mysql -h ${MYSQL_HOST} -uroot -p${MYSQL_ROOT_PASSWD} > /dev/null 2>&1
+if [ -z ${MYSQL_JEEDOM_PASSWD} ]; then
+	MYSQL_JEEDOM_PASSWD=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 20)
+	echo "Use generate jeedom mysql password : ${MYSQL_JEEDOM_PASSWD}"
+fi
+mysql_sql "CREATE USER 'jeedom'@'localhost' IDENTIFIED BY '${MYSQL_JEEDOM_PASSWD}';"
+mysql_sql "DROP DATABASE IF EXISTS jeedom;"
+mysql_sql "CREATE DATABASE jeedom;"
+mysql_sql "GRANT ALL PRIVILEGES ON jeedom.* TO 'jeedom'@'localhost';"
+cp ${JEEDOM_VOL}/core/config/common.config.sample.php ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#PASSWORD#/${MYSQL_JEEDOM_PASSWD}/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#DBNAME#/jeedom/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#USERNAME#/jeedom/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#PORT#/3306/g" ${JEEDOM_VOL}/core/config/common.config.php
+sed -i "s/#HOST#/${MYSQL_HOST}/g" ${JEEDOM_VOL}/core/config/common.config.php

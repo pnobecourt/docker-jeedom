@@ -24,14 +24,11 @@ SSH_PORT=22 \
 MODE_HOST=0
 
 # Jeedom installation
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends apt-transport-https curl gnupg && \
-    echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/apt/sources.list.d/nodesource.list && \
+RUN echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/apt/sources.list.d/nodesource.list && \
     echo "deb http://www.deb-multimedia.org stretch main non-free" | tee -a /etc/apt/sources.list.d/debian-multimedia.list && \
-    apt-get update ; \
     curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+    apt-get update ; \
     apt-get install -y --allow-unauthenticated --no-install-recommends deb-multimedia-keyring && \
-    apt-get update && \
     apt-get install -y --no-install-recommends \
    	 	 	 	 	adduser \
 	 	 	 	 	apache2 \
@@ -153,7 +150,7 @@ RUN apt-get update && \
 ADD /root /
 
 # Define Volumes
-VOLUME [ "/etc","$JEEDOM_VOL" ]
+VOLUME [ "/" ]
 
 # Ports configuration
 EXPOSE 22 80 443

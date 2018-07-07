@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Change root password
+#------------------------------------------------------------------------------
+if [ -z ${SHELL_ROOT_PASSWORD} ]; then
+	SHELL_ROOT_PASSWORD=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 20)
+	echo "Use generate root password : ${SHELL_ROOT_PASSWORD}"
+fi
+echo "root:${SHELL_ROOT_PASSWORD}" | chpasswd

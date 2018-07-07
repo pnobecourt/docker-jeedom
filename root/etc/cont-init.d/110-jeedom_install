@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Jeedom Install
+#------------------------------------------------------------------------------
+mkdir -p /tmp/jeedom
+chmod 777 -R /tmp/jeedom
+chown www-data:www-data -R /tmp/jeedom
+php ${JEEDOM_VOL}/install/install.php mode=force

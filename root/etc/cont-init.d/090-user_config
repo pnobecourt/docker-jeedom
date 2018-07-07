@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Configure users
+#------------------------------------------------------------------------------
+usermod -a -G dialout,tty www-data
+usermod -a -G dialout,tty dockeruser
+if [ $(grep "www-data ALL=(ALL) NOPASSWD: ALL" /etc/sudoers | wc -l) -eq 0 ];then
+    echo "www-data ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+fi
+if [ $(grep "dockeruser ALL=(ALL) NOPASSWD: ALL" /etc/sudoers | wc -l) -eq 0 ];then
+    echo "dockeruser ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+fi

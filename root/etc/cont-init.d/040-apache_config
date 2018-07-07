@@ -1,0 +1,37 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Configure Apache Web Server
+#------------------------------------------------------------------------------
+
+## Fix Apache Private Tmp
+rm /etc/systemd/system/multi-user.target.wants/apache2.service
+cp /lib/systemd/system/apache2.service /etc/systemd/system/multi-user.target.wants/
+sed -i 's/PrivateTmp=true/PrivateTmp=false/g' /etc/systemd/system/multi-user.target.wants/apache2.service > /dev/null 2>&1
+sed -i 's/PrivateTmp=true/PrivateTmp=false/g' /lib/systemd/system/apache2.service > /dev/null 2>&1
+
+## Change Apache listening port
+if [ ! -z ${APACHE_PORT} ]; then
+	echo 'Change apache listen port to : '${APACHE_PORT}
+	echo "Listen ${APACHE_PORT}" > /etc/apache2/ports.conf
+	sed -i -E "s/\<VirtualHost \*:(.*)\>/VirtualHost \*:${APACHE_PORT}/" /etc/apache2/sites-enabled/000-default.conf
+fi
+
+## Configure Apache security
+cp ${JEEDOM_VOL}/install/apache_security /etc/apache2/conf-available/security.conf
+rm /etc/apache2/conf-enabled/security.conf > /dev/null 2>&1
+ln -s /etc/apache2/conf-available/security.conf /etc/apache2/conf-enabled/
+
+## Configure Apache default site
+cp ${JEEDOM_VOL}/install/apache_default /etc/apache2/sites-available/000-default.conf
+rm /etc/apache2/sites-enabled/000-default.conf > /dev/null 2>&1
+ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/
+
+## Remove vhost configuration
+rm /etc/apache2/conf-available/other-vhosts-access-log.conf > /dev/null 2>&1
+rm /etc/apache2/conf-enabled/other-vhosts-access-log.conf > /dev/null 2>&1
+
+## Configure Apache systemd service
+mkdir /etc/systemd/system/apache2.service.d
+echo "[Service]" > /etc/systemd/system/apache2.service.d/privatetmp.conf
+echo "PrivateTmp=no" >> /etc/systemd/system/apache2.service.d/privatetmp.conf

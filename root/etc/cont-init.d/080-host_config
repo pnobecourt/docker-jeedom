@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+
+#------------------------------------------------------------------------------
+# Configure hosts file
+#------------------------------------------------------------------------------
+if [ ! -z ${MODE_HOST} ] && [ ${MODE_HOST} -eq 1 ]; then
+	echo 'Update /etc/hosts for host mode'
+	echo "127.0.0.1 localhost jeedom" > /etc/hosts
+fi
