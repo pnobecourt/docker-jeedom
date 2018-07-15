@@ -137,7 +137,6 @@ RUN echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/ap
            && \
     curl -L -S https://github.com/jeedom/core/archive/stable.zip -o /tmp/jeedom_stable.zip && \
     mkdir -p /tmp/install_temp ${JEEDOM_VOL} && \
-#    find ${JEEDOM_VOL} ! -name 'index.html' -type f -exec rm -rf {} && 
     unzip -qo /tmp/jeedom_stable.zip -d /tmp/install_temp && \
     cp -R /tmp/install_temp/core-*/* ${JEEDOM_VOL} && \
     cp -R /tmp/install_temp/core-*/.[^.]* ${JEEDOM_VOL} && \
@@ -150,7 +149,7 @@ RUN echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/ap
 ADD /root /
 
 # Define Volumes
-VOLUME [ "/" ]
+VOLUME [ "/etc","/var/www/html" ]
 
 # Ports configuration
 EXPOSE 22 80 443

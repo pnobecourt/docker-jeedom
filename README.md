@@ -9,6 +9,7 @@ Create container :
                --restart always \
                --name jeedom \
                --hostname jeedom \
+               --network host \
                -p 22:22/tcp \
                -p 80:80/tcp \
                -p 443:443/tcp \
@@ -38,6 +39,7 @@ Or docker-compose :
             depends_on:
                 - mysql
             restart: always
+            network_mode: host
             ports:
                 - "22:22/tcp"
                 - "80:80/tcp"
