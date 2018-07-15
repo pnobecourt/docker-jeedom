@@ -29,7 +29,7 @@ RUN echo "deb https://deb.nodesource.com/node_8.x stretch main" | tee -a /etc/ap
     curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
     apt-get update ; \
     apt-get install -y --allow-unauthenticated --no-install-recommends deb-multimedia-keyring && \
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --allow-unauthenticated --no-install-recommends \
    	 	 	 	 	adduser \
 	 	 	 	 	apache2 \
 	 	 	 	 	apache2-utils \
